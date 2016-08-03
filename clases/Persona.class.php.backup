@@ -1,0 +1,110 @@
+<?php
+    require_once 'Conexion.php';
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ * Description of persona
+ *
+ * @author Oswaldo Franco
+ */
+    class Persona {
+        private $_con;
+        private $_horaReg;
+        private $_fechaReg;
+        private $_confirmado;
+        private $_numero;
+
+        public function __construct(){
+            $this->_con = Conexion::enlaceBD();
+            $this->_horaReg = date('h:i:s');
+            $this->_fechaReg = date('Y-m-d');
+            $this->_confirmado = "no";
+            $this->_numero = 0;
+        }
+
+
+        public function ingresarPer($nac,$cedula,$nombre,$apellido,$telmovil,$telfijo,$fecnac,$correo,$club,$edodir,$mundir,$direccion,$banco,$tiptran,
+                                                                $numtran,$fectran,$bancodest,$genero,$talla,$pais){
+            try {
+                $sql = "INSERT INTO participante (id,nac,cedula,nombre,apellido,celular,telefonofijo,fechanac,correo,club,estadodir,municipiodir,direccion,
+                                                                        horareg,fechareg,tipotrans,nrotrans,fechatrans,bancodest,genero,talla,pais,banco,confirmado,numero) VALUES 
+                                                                        (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                $query = $this->_con ->db->prepare($sql);
+                $query->execute(array($nac,$cedula,$nombre,$apellido,$telmovil,$telfijo,$fecnac,$correo,$club,$edodir,$mundir,$direccion,  $this->_horaReg,  $this->_fechaReg,
+                                                              $tiptran,$numtran,$fectran,$bancodest,$genero,$talla,$pais,$banco,  $this->_confirmado,  $this->_numero ));
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
+        
+        public function buscarPer($nac,$ced){
+            try {
+                $query = $this->_con->db->prepare("SELECT * FROM participante WHERE nac = ? AND cedula = ?");
+                $query->execute(array($nac,$ced));
+                return $query->rowCount();
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
+        
+        public function buscarNrotran($nrotran){
+            try {
+                $query = $this->_con->db->prepare("SELECT * FROM participante WHERE nrotrans = ?");
+                $query->execute(array($nrotran));
+                return $query->rowCount();
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
+
+        public function modificarPer($id,$nac,$cedula,$nombre,$apellido,$telmovil,$telfijo,$fecnac,$correo,$club,$edodir,$mundir,$direccion,$banco,$tiptran,$numtran,
+                                                                $fectran,$bancodest,$genero,$talla,$pais,$confirmado, $numero){
+            try {
+                $sql = "UPDATE participante SET nac = ?, cedula = ?, nombre = ?, apellido = ?, celular = ?, telefonofijo = ?, fechanac = ?, correo = ?, club = ?, estadodir = ?,
+                                                                        municipiodir = ?, direccion = ?, tipotrans = ?, nrotrans = ?, fechatrans = ?, bancodest = ?, genero = ?,
+                                                                        talla = ?, pais = ?, banco = ?, confirmado = ?, numero = ? WHERE id = ?)";
+                $query = $this->_con->db->prepare($sql);
+                $query->execute(array($nac,$cedula,$nombre,$apellido,$telmovil,$telfijo,$fecnac,$correo,$club,$edodir,$mundir,$direccion, $tiptran,$numtran,$fectran,
+                                                            $bancodest,$genero,$talla,$pais,$banco, $confirmado, $numero,$id ));
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
+        
+        public function confirPer($id){
+            try {
+                $query = $this->_con->db->prepare("UPDATE participante SET confirmado = ? WHERE id = ?");
+                $query->execute(array(1,$id));
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
+        
+        public function asignarNum($id){
+            try {
+                $query = $this->_con->db->prepare("SELECT MAX(numero) FROM participante");
+                $query->execute();
+                $result = $query->fetchAll(PDO::FETCH_ASSOC);
+                if($result[0] == 0){
+                    $num = 150;
+                }else{
+                    $num = $result[0]+1;
+                }
+                try {
+                    $query = $this->_con->db->prepare("UPDATE participante SET numero = ? WHERE id = ?");
+                    $query->execute(array($num,$id));
+                    return $num;
+                } catch (PDOException $e) {
+                    $e->getMessage();
+                }
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
+
+    }

@@ -1,0 +1,2 @@
+[19-Aug-2015 19:37:24 UTC] PHP Warning:  pg_query(): Query failed: ERROR:  permission denied for relation pais in /home/oriented/public_html/registro/conexion/Postgres.php on line 50
+[19-Aug-2015 19:38:02 UTC] PHP Warning:  pg_query(): Query failed: ERROR:  permission denied for relation pais in /home/oriented/public_html/registro/conexion/Postgres.php on line 50
